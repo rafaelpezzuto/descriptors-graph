@@ -1,4 +1,4 @@
-
+#!/usr/bin/python3
 import logging
 import sys
 sys.path.append('../agutils/')
@@ -47,7 +47,7 @@ class Graph(object):
         target_descriptors_names = {d for d in edge.target.descriptors_names}
         return list(source_descriptors_names.intersection(target_descriptors_names))
 
-    def save(self, path_graph: str):
+    def save(self, path_graph: str, k: int):
         result_file = open(path_graph, 'w')
         result_file.write('nodedef>name VARCHAR,year INTEGER,descriptors VARCHAR\n')
         for n in self.nodes:
@@ -56,8 +56,9 @@ class Graph(object):
 
         result_file.write('edgedef>Source,Target,Weight DOUBLE,common_descriptors_names VARCHAR\n')
         for e in self.edges:
-            result_file.write(','.join([e.source.id_medline, e.target.id_medline, str(e.weight), '#'.join([e for e in e.common_descriptors_names])]))
-            result_file.write('\n')
+            if e.weight >= k:
+                result_file.write(','.join([e.source.id_medline, e.target.id_medline, str(e.weight), '#'.join([e for e in e.common_descriptors_names])]))
+                result_file.write('\n')
 
 
 class Descriptor(object):
@@ -81,9 +82,9 @@ class InvalidDescriptor(Descriptor):
 class DescriptorManager(object):
 
     @staticmethod
-    def filter_descriptor(descriptor: Descriptor, invalid_descriptors: list):
+    def filter_descriptor(descriptor: Descriptor, invalid_descriptors: list, filename: str):
         if descriptor.names in [inv.names for inv in invalid_descriptors]:
-            logging.basicConfig(filename='data/removed_descriptors.tsv', filemode='w', format='%(message)s')
+            logging.basicConfig(filename=filename, filemode='w', format='%(message)s')
             logging.warning(str(descriptor))
             return True
         else:
@@ -91,9 +92,12 @@ class DescriptorManager(object):
 
 
 if __name__ == "__main__":
-    FILE_DESCRIPTORS = 'data/descriptors.tsv'
-    FILE_INVALID_DESCRIPTORS = 'data/invalid_descriptors.tsv'
-    FILE_RESULT_GRAPH = 'graph.gdf'
+    K = int(sys.argv[1])
+    BASE_FOLDER = '/home/rafael/Temp/rev-saude/'
+    FILE_DESCRIPTORS = BASE_FOLDER + 'data/descriptors.tsv'
+    FILE_INVALID_DESCRIPTORS = BASE_FOLDER + 'data/invalid_descriptors.tsv'
+    FILE_RESULT_GRAPH = BASE_FOLDER + 'graph_w' + str(K) + '.gdf'
+    FILE_LOG = BASE_FOLDER + 'data/removed_descriptors.tsv'
 
     descriptors = FileUtils.get_models_from_path_csv(FILE_DESCRIPTORS, sep='\t', model=Descriptor)
     print('há %d descritores' % (len(descriptors)))
@@ -102,7 +106,7 @@ if __name__ == "__main__":
     # add descritor with empty name
     invalid_descriptors.append(Descriptor(**{'names': ''}))
 
-    descriptors = [d for d in descriptors if not DescriptorManager.filter_descriptor(d, invalid_descriptors)]
+    descriptors = [d for d in descriptors if not DescriptorManager.filter_descriptor(d, invalid_descriptors, FILE_LOG)]
     print('há %d descritores, após remoção de inválidos' % len(descriptors))
 
     articles = {}
@@ -123,4 +127,4 @@ if __name__ == "__main__":
                 print('\ri: %d\tj: %d' % (ind_i + 1, ind_j + 1), end='')
                 g.add_edge(i, j)
     
-    g.save(FILE_RESULT_GRAPH)
+    g.save(FILE_RESULT_GRAPH, K)
