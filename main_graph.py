@@ -113,14 +113,14 @@ class DescriptorManager(object):
 
 if __name__ == "__main__":
     # peso minimo via stdin
-    MIN_WEIGHT = sys.argv[1]
+    MIN_WEIGHT = int(sys.argv[1])
 
     # configuracoes basicas
     BASE_FOLDER = '/home/rafael/Temp/rev-saude/'
     FILE_DESCRIPTORS = BASE_FOLDER + 'data/descriptors_no_edat.tsv'
     FILE_INVALID_DESCRIPTORS = BASE_FOLDER + 'data/invalid_descriptors.tsv'
     FILE_LOG = BASE_FOLDER + 'data/removed_descriptors.tsv'
-    FILE_RESULT_GRAPH = BASE_FOLDER + 'data/graph_w'
+    FILE_RESULT_GRAPH = BASE_FOLDER + 'por_ano/graph_w_'
 
     # le descritores
     descriptors = FileUtils.get_models_from_path_csv(FILE_DESCRIPTORS, sep='\t', model=Descriptor)
