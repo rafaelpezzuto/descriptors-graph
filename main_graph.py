@@ -62,7 +62,7 @@ class Graph(object):
 
     def save(self, path_graph: str, min_weigth: int):
         result_file = open(path_graph, 'w')
-        result_file.write('nodedef>name VARCHAR,year INTEGER,descriptors VARCHAR\n')
+        result_file.write('nodedef>name VARCHAR,year INTEGER,Label VARCHAR\n')
         n_nodes = 0
         n_edges = 0
         for n in self.nodes:
