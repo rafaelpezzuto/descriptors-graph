@@ -78,6 +78,8 @@ class Graph(object):
                 result_file.write('\n')
                 n_edges += 1
 
+        result_file.close()
+
         print(str(self.nodes[0].year), str(n_nodes), str(n_edges))
 
 
@@ -120,7 +122,7 @@ if __name__ == "__main__":
     FILE_DESCRIPTORS = BASE_FOLDER + 'data/descriptors_no_edat.tsv'
     FILE_INVALID_DESCRIPTORS = BASE_FOLDER + 'data/invalid_descriptors.tsv'
     FILE_LOG = BASE_FOLDER + 'data/removed_descriptors.tsv'
-    FILE_RESULT_GRAPH = BASE_FOLDER + 'por_ano/graph_w_'
+    FILE_RESULT_GRAPH = BASE_FOLDER + 'por_ano/t2/graph_'
 
     # le descritores
     descriptors = FileUtils.get_models_from_path_csv(FILE_DESCRIPTORS, sep='\t', model=Descriptor)
