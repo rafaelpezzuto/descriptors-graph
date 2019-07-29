@@ -43,7 +43,7 @@ class GDFManager(object):
 
 if __name__ == "__main__":
     # configuracoes basicas
-    PATH_FOLDER_GDF = '/home/rafael/'
+    PATH_FOLDER_GDF = '/home/rafael/Temp/rev-saude/por_ano/t2/gdf_modules/'
 
     gdfs_paths = sorted([PATH_FOLDER_GDF + f for f in os.listdir(PATH_FOLDER_GDF) if f.endswith('.gdf')])
 
