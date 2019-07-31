@@ -15,6 +15,7 @@ class GDFManager(object):
     def __init__(self):
         self.nodes = []
         self.module_to_descriptors_freq = {}
+        self.descriptor_freq = {}
 
     def count_descriptors(self):
         for node in self.nodes:
@@ -26,6 +27,13 @@ class GDFManager(object):
                     self.module_to_descriptors_freq[node.module][descriptor] = 1
                 else:
                     self.module_to_descriptors_freq[node.module][descriptor] += 1
+
+            for descriptor in node.label.split('#'):
+                if descriptor not in self.descriptor_freq:
+                    self.descriptor_freq[descriptor] = 1
+                else:
+                    self.descriptor_freq[descriptor] += 1
+
 
     def save_descriptors_count(self, path_descriptors_count: str):
         result_file = open(path_descriptors_count, 'w')
@@ -47,6 +55,8 @@ if __name__ == "__main__":
 
     gdfs_paths = sorted([PATH_FOLDER_GDF + f for f in os.listdir(PATH_FOLDER_GDF) if f.endswith('.gdf')])
 
+    nodes_by_year = {}
+
     for g in gdfs_paths:
         print('file %s' % g)
         arq_gdf = open(g)
@@ -67,5 +77,18 @@ if __name__ == "__main__":
         gdf_manager = GDFManager()
         gdf_manager.nodes = vertices
         gdf_manager.count_descriptors()
-        gdf_manager.save_descriptors_count(PATH_FOLDER_GDF + 'classes_' + g.split('/')[-1].split('.')[0] + '.csv')
-    
+        nodes_by_year[g] = gdf_manager
+        # gdf_manager.save_descriptors_count(PATH_FOLDER_GDF + 'classes_' + g.split('/')[-1].split('.')[0] + '.csv')
+
+    result_file = open('nodes_by_year.csv', 'w')
+    result_file.write('ANO,FREQUENCIA:DESCRITOR\n')
+    for year in sorted(nodes_by_year):
+        df = nodes_by_year.get(year).descriptor_freq
+        sdf = [(k, df[k]) for k in sorted(df, key=df.get, reverse=True)]
+        result_file.write(year.split('/')[-1].split('.')[0])
+        result_file.write(',')
+        for d, f in sdf:
+            result_file.write(':'.join([str(f), d]))
+            result_file.write(',')
+        result_file.write('\n')
+    result_file.close()
